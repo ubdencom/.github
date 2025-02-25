@@ -1,9 +1,9 @@
 # 🚀 Ubden LLC | The Culture of Innovation  
 
-Hello! At **Ubden LLC**, we develop modern software solutions, support open-source projects, and contribute to technological advancements. 🖥️⚡  
+Hello! At **Ubden® Organization**, we develop modern software solutions, support open-source projects, and contribute to technological advancements. 🖥️⚡  
 
 ## 🌟 About Us  
-**Ubden LLC** is an organization specializing in software development, automation, artificial intelligence, data science, and web technologies. By embracing the open-source culture, we create projects that inspire developers and grow our community.  
+**Ubden® Organization** is an organization specializing in software development, automation, artificial intelligence, data science, and web technologies. By embracing the open-source culture, we create projects that inspire developers and grow our community.  
 
 ## 🔥 What We Do?  
 - 🛠 **Open-Source Projects** – We develop useful and high-quality open-source software.  
@@ -30,7 +30,7 @@ Hello! At **Ubden LLC**, we develop modern software solutions, support open-sour
 
 ## 🗺️ Our Other Branches!  
 - 🌎 **Ubden A.Ş** Türkiye [Turkey Office](https://www.ubden.com.tr)
--  🌎 **Ubden LLC** United States [USA Office](https://www.ubden.com)  
+- 🌎 **Ubden LLC** United States [USA Office](https://www.ubden.com)  
 - 🌎 **Ubden OU** Estonia [European Office](https://www.ubden.com)  
 
 
