@@ -29,7 +29,9 @@ Hello! At **Ubden LLC**, we develop modern software solutions, support open-sour
 ---  
 
 ## 🗺️ Our Other Branches!  
-- 🌎 **Ubden A.Ş** Türkiye [Turkey Office](https://github.com/ubdencom)  
-- 🌎 **Ubden OU** Estonia [European Office](https://github.com/ubdendev)  
+- 🌎 **Ubden A.Ş** Türkiye [Turkey Office](https://www.ubden.com.tr)
+-  🌎 **Ubden LLC** United States [USA Office](https://www.ubden.com)  
+- 🌎 **Ubden OU** Estonia [European Office](https://www.ubden.com)  
+
 
 🚀 **Open-source means sharing and creating!** Let's push technology forward together. ✨
