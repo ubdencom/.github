@@ -1,4 +1,4 @@
-# 🚀 Ubden LLC | The Culture of Innovation  
+# 🚀 Ubden®| The Culture of Innovation 
 
 Hello! At **Ubden® Organization**, we develop modern software solutions, support open-source projects, and contribute to technological advancements. 🖥️⚡  
 
