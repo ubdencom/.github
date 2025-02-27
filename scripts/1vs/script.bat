@@ -1,6 +1,6 @@
 @echo off
 :: ====================================================================
-:: UBDEN TEKNOLOJISI A.S - Management Script (Hide only Shut Down hack)
+:: UBDEN TEKNOLOJISI A.S - Management Script (Hide Only Shut Down Hack)
 :: ====================================================================
 
 :: Check for admin rights. If not admin, re-run as admin.
@@ -11,7 +11,7 @@ if %errorlevel% neq 0 (
     exit
 )
 
-:: Use code page 437 for fewer special-char issues
+:: We avoid special Turkish chars, but set codepage to 437 for safety
 chcp 437 >nul
 
 :: Title, color, clear screen
@@ -25,18 +25,18 @@ echo              UBDEN TEKNOLOJISI A.S
 echo                MANAGEMENT TOOL
 echo =======================================================
 echo.
-echo [1] Apply Group Policy (Hide Shut Down & Provide Custom Restart)
-echo [2] Remove Group Policy (Restore Shut Down)
+echo [1] Apply Policy (Hide Shut Down, Add Custom Restart)
+echo [2] Remove Policy (Restore Shut Down)
 echo [3] Reset RDS GracePeriod
 echo [4] Install WinRAR
-echo [5] BGInfo Settings and Desktop
+echo [5] BGInfo Settings and Desktop (Startup)
 echo [6] RDP Settings (Enable and Add User)
 echo [7] Exit
 echo.
 set /p secim=Please select (1-7): 
 
-if "%secim%"=="1" goto APPLY_GP
-if "%secim%"=="2" goto REMOVE_GP
+if "%secim%"=="1" goto APPLY_POLICY
+if "%secim%"=="2" goto REMOVE_POLICY
 if "%secim%"=="3" goto RESET_GRACE
 if "%secim%"=="4" goto INSTALL_WINRAR
 if "%secim%"=="5" goto CONFIG_BGINFO
@@ -48,19 +48,18 @@ pause
 cls
 goto MENU
 
-:APPLY_GP
+:APPLY_POLICY
 cls
 echo *** Applying policy: hide Shut Down in Start menu...
-echo Note: This will also hide the built-in Restart button.
+echo Note: This also hides the native Restart button.
 
-:: Hide Shut Down/Restart from Start menu
+:: Hide Shut Down & Restart from Start menu
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoClose /t REG_DWORD /d 1 /f >nul
 reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoClose /t REG_DWORD /d 1 /f >nul
 
-:: Provide a custom "Restart" shortcut on Desktop
+:: Provide a custom "RestartServer.lnk" on Desktop
 set SHORTCUT_PATH=%USERPROFILE%\Desktop\RestartServer.lnk
 
-:: We'll generate a shortcut using PowerShell
 echo Creating custom "Restart" shortcut on Desktop...
 powershell -NoProfile -Command ^
   "$WScriptShell = New-Object -ComObject WScript.Shell; ^
@@ -73,17 +72,18 @@ powershell -NoProfile -Command ^
    $Shortcut.WorkingDirectory = 'C:\\Windows\\System32'; ^
    $Shortcut.Save()"
 
-:: gpupdate for good measure
+:: gpupdate
 gpupdate /force >nul
 
 echo.
-echo *** Shut Down hidden. Built-in Restart also hidden, but custom shortcut placed on desktop.
-echo To restart, double-click "RestartServer" shortcut on Desktop.
+echo *** Shut Down hidden. Built-in Restart also hidden.
+echo A custom "RestartServer" shortcut has been placed on the desktop.
+echo Use that to restart this server.
 pause
 cls
 goto MENU
 
-:REMOVE_GP
+:REMOVE_POLICY
 cls
 echo *** Restoring Shut Down (and built-in Restart) in Start menu...
 reg delete "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoClose /f >nul
@@ -94,7 +94,7 @@ if exist "%USERPROFILE%\Desktop\RestartServer.lnk" del "%USERPROFILE%\Desktop\Re
 
 gpupdate /force >nul
 echo.
-echo *** Shut Down and Restart are restored in Start menu.
+echo *** Shut Down and Restart are restored in the Start menu.
 pause
 cls
 goto MENU
@@ -209,18 +209,31 @@ if %errorlevel% neq 0 (
     goto MENU
 )
 
-echo Running BGInfo...
+echo Running BGInfo once...
 "C:\bginfo\Bginfo64.exe" "C:\bginfo\Config.bgi" /TIMER:0 /SILENT /NOLICPROMPT
 
-echo Setting wallpaper...
+echo Setting wallpaper to C:\bginfo\1vsco.jpg...
 reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /v Wallpaper /t REG_SZ /d "C:\bginfo\1vsco.jpg" /f >nul
 RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters
 
-echo Prevent user from changing wallpaper...
+echo Locking wallpaper (prevent user from changing)...
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\ActiveDesktop" /v NoChangingWallPaper /t REG_DWORD /d 1 /f >nul
 
+echo Creating BGInfo Startup shortcut so it runs on each login...
+powershell -NoProfile -Command ^
+  "$WScriptShell = New-Object -ComObject WScript.Shell; ^
+   $StartupFolder = $WScriptShell.SpecialFolders('Startup'); ^
+   $ShortcutFile = Join-Path $StartupFolder 'BGInfo.lnk'; ^
+   $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile); ^
+   $Shortcut.TargetPath = 'C:\\bginfo\\Bginfo64.exe'; ^
+   $Shortcut.Arguments = 'C:\\bginfo\\Config.bgi /TIMER:0 /SILENT /NOLICPROMPT'; ^
+   $Shortcut.IconLocation = 'C:\\bginfo\\Bginfo64.exe,0'; ^
+   $Shortcut.Description = 'BGInfo on Startup'; ^
+   $Shortcut.WorkingDirectory = 'C:\\bginfo'; ^
+   $Shortcut.Save()"
+
 echo.
-echo *** BGInfo setup completed!
+echo *** BGInfo setup completed! It will run automatically each login.
 pause
 cls
 goto MENU
