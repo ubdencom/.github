@@ -1,6 +1,7 @@
 @echo off
 :: ====================================================================
 :: UBDEN TEKNOLOJISI A.S - Management Script (Hide Only Shut Down Hack)
+:: Single-line PowerShell Shortcut Creation
 :: ====================================================================
 
 :: Check for admin rights. If not admin, re-run as admin.
@@ -11,7 +12,7 @@ if %errorlevel% neq 0 (
     exit
 )
 
-:: We avoid special Turkish chars, but set codepage to 437 for safety
+:: Use code page 437 for fewer special-char issues
 chcp 437 >nul
 
 :: Title, color, clear screen
@@ -60,19 +61,18 @@ reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\E
 :: Provide a custom "RestartServer.lnk" on Desktop
 set SHORTCUT_PATH=%USERPROFILE%\Desktop\RestartServer.lnk
 
-echo Creating custom "Restart" shortcut on Desktop...
-powershell -NoProfile -Command ^
-  "$WScriptShell = New-Object -ComObject WScript.Shell; ^
-   $Shortcut = $WScriptShell.CreateShortcut('%SHORTCUT_PATH%'); ^
-   $Shortcut.TargetPath = 'C:\\Windows\\System32\\shutdown.exe'; ^
-   $Shortcut.Arguments = '/r /t 0'; ^
-   $Shortcut.WindowStyle = 1; ^
-   $Shortcut.IconLocation = 'C:\\Windows\\System32\\shell32.dll,238'; ^
-   $Shortcut.Description = 'Restart Server'; ^
-   $Shortcut.WorkingDirectory = 'C:\\Windows\\System32'; ^
-   $Shortcut.Save()"
+echo Creating custom "RestartServer" shortcut on Desktop...
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "$ws = New-Object -ComObject WScript.Shell; ^
+   $sc = $ws.CreateShortcut('%SHORTCUT_PATH%'); ^
+   $sc.TargetPath = 'C:\\Windows\\System32\\shutdown.exe'; ^
+   $sc.Arguments = '/r /t 0'; ^
+   $sc.WindowStyle = 1; ^
+   $sc.IconLocation = 'C:\\Windows\\System32\\shell32.dll,238'; ^
+   $sc.Description = 'Restart Server'; ^
+   $sc.WorkingDirectory = 'C:\\Windows\\System32'; ^
+   $sc.Save();"
 
-:: gpupdate
 gpupdate /force >nul
 
 echo.
@@ -150,7 +150,7 @@ set "WINRAR_URL=https://www.rarlab.com/rar/winrar-x64-622.exe"
 set "WINRAR_TEMP=%TEMP%\winrar.exe"
 
 echo Downloading from: %WINRAR_URL%
-powershell -Command "try { Invoke-WebRequest -Uri '%WINRAR_URL%' -OutFile '%WINRAR_TEMP%' } catch { exit 1 }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "try { Invoke-WebRequest -Uri '%WINRAR_URL%' -OutFile '%WINRAR_TEMP%' } catch { exit 1 }"
 if %errorlevel% neq 0 (
     echo.
     echo Failed to download WinRAR. Check the URL or your internet connection.
@@ -174,7 +174,7 @@ echo *** BGInfo Settings and Desktop configuration...
 if not exist "C:\bginfo" mkdir "C:\bginfo"
 
 echo 1/4 - Downloading wallpaper...
-powershell -Command "try { Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/ubdencom/.github/main/scripts/1vsco.jpg' -OutFile 'C:\bginfo\1vsco.jpg' } catch { exit 1 }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "try { Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/ubdencom/.github/main/scripts/1vsco.jpg' -OutFile 'C:\bginfo\1vsco.jpg' } catch { exit 1 }"
 if %errorlevel% neq 0 (
     echo Failed to download 1vsco.jpg
     pause
@@ -183,7 +183,7 @@ if %errorlevel% neq 0 (
 )
 
 echo 2/4 - Downloading Bginfo.exe...
-powershell -Command "try { Invoke-WebRequest -Uri 'https://github.com/ubdencom/.github/raw/main/scripts/1vs/Bginfo.exe' -OutFile 'C:\bginfo\Bginfo.exe' } catch { exit 1 }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "try { Invoke-WebRequest -Uri 'https://github.com/ubdencom/.github/raw/main/scripts/1vs/Bginfo.exe' -OutFile 'C:\bginfo\Bginfo.exe' } catch { exit 1 }"
 if %errorlevel% neq 0 (
     echo Failed to download Bginfo.exe
     pause
@@ -192,7 +192,7 @@ if %errorlevel% neq 0 (
 )
 
 echo 3/4 - Downloading Bginfo64.exe...
-powershell -Command "try { Invoke-WebRequest -Uri 'https://github.com/ubdencom/.github/raw/main/scripts/1vs/Bginfo64.exe' -OutFile 'C:\bginfo\Bginfo64.exe' } catch { exit 1 }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "try { Invoke-WebRequest -Uri 'https://github.com/ubdencom/.github/raw/main/scripts/1vs/Bginfo64.exe' -OutFile 'C:\bginfo\Bginfo64.exe' } catch { exit 1 }"
 if %errorlevel% neq 0 (
     echo Failed to download Bginfo64.exe
     pause
@@ -201,7 +201,7 @@ if %errorlevel% neq 0 (
 )
 
 echo 4/4 - Downloading Config.bgi...
-powershell -Command "try { Invoke-WebRequest -Uri 'https://github.com/ubdencom/.github/raw/main/scripts/1vs/Config.bgi' -OutFile 'C:\bginfo\Config.bgi' } catch { exit 1 }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "try { Invoke-WebRequest -Uri 'https://github.com/ubdencom/.github/raw/main/scripts/1vs/Config.bgi' -OutFile 'C:\bginfo\Config.bgi' } catch { exit 1 }"
 if %errorlevel% neq 0 (
     echo Failed to download Config.bgi
     pause
@@ -220,20 +220,20 @@ echo Locking wallpaper (prevent user from changing)...
 reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\ActiveDesktop" /v NoChangingWallPaper /t REG_DWORD /d 1 /f >nul
 
 echo Creating BGInfo Startup shortcut so it runs on each login...
-powershell -NoProfile -Command ^
-  "$WScriptShell = New-Object -ComObject WScript.Shell; ^
-   $StartupFolder = $WScriptShell.SpecialFolders('Startup'); ^
-   $ShortcutFile = Join-Path $StartupFolder 'BGInfo.lnk'; ^
-   $Shortcut = $WScriptShell.CreateShortcut($ShortcutFile); ^
-   $Shortcut.TargetPath = 'C:\\bginfo\\Bginfo64.exe'; ^
-   $Shortcut.Arguments = 'C:\\bginfo\\Config.bgi /TIMER:0 /SILENT /NOLICPROMPT'; ^
-   $Shortcut.IconLocation = 'C:\\bginfo\\Bginfo64.exe,0'; ^
-   $Shortcut.Description = 'BGInfo on Startup'; ^
-   $Shortcut.WorkingDirectory = 'C:\\bginfo'; ^
-   $Shortcut.Save()"
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "$ws = New-Object -ComObject WScript.Shell; ^
+   $startup = $ws.SpecialFolders('Startup'); ^
+   $scfile = Join-Path $startup 'BGInfo.lnk'; ^
+   $sc = $ws.CreateShortcut($scfile); ^
+   $sc.TargetPath = 'C:\\bginfo\\Bginfo64.exe'; ^
+   $sc.Arguments = 'C:\\bginfo\\Config.bgi /TIMER:0 /SILENT /NOLICPROMPT'; ^
+   $sc.IconLocation = 'C:\\bginfo\\Bginfo64.exe,0'; ^
+   $sc.Description = 'BGInfo on Startup'; ^
+   $sc.WorkingDirectory = 'C:\\bginfo'; ^
+   $sc.Save();"
 
 echo.
-echo *** BGInfo setup completed! It will run automatically each login.
+echo *** BGInfo setup completed! It will run automatically at each login.
 pause
 cls
 goto MENU
